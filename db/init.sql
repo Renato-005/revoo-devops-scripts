@@ -1,0 +1,8 @@
+CREATE DATABASE db_revoo;
+USE db_revoo;
+
+CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100),
+  email VARCHAR(120)
+);
