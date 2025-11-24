@@ -1,56 +1,29 @@
-# Revoo - Scripts DevOps (Azure)
+# Revoo – Scripts de Infraestrutura (Azure + MySQL)
 
-Este repositório contém os scripts usados na entrega **DevOps Tools & Cloud Computing**.
+Conjunto de scripts usados para criar o ambiente do projeto **Revoo** na Azure.
 
-## 1. Provisionamento Azure (IaaS)
+## 1. Infraestrutura Azure
 
-Arquivo: `infra-revoo-azure.sh`
+**Arquivo:** `infra-revoo-azure.sh`
 
 Cria:
-- Resource Group `rg-revoo-dev`
-- VNet `vnet-revoo` com subnets `subnet-app` e `subnet-db`
-- NSGs `nsg-revoo-app` e `nsg-revoo-db` com regras:
-  - RDP 3389 (restrito ao seu IP)
-  - SSH 22 (restrito ao seu IP)
-  - Porta da aplicação (default 3000)
-  - Porta do banco (default 3306) limitada à subnet da aplicação
-- 2 VMs:
-  - Windows: `vm-revoo-app` (Front/App/API)
-  - Linux: `vm-revoo-db` (Banco)
 
-### Como executar
-No **Azure Cloud Shell (Bash)**:
+- Resource Group `rg-revoo-dev` em `eastus2`
+- VNet `vnet-revoo` (`10.0.0.0/16`)
+  - `subnet-app` (`10.0.1.0/24`) – VM Windows (aplicação)
+  - `subnet-db` (`10.0.2.0/24`) – VM Linux (banco)
+- NSGs `nsg-revoo-app` e `nsg-revoo-db` com regras para:
+  - RDP (3389)
+  - HTTP/HTTPS (80/443)
+  - porta da aplicação (3000)
+  - SSH (22)
+  - porta do banco (3306) liberada apenas para a subnet da aplicação
+- VMs:
+  - `vm-revoo-app` – Windows Server 2022
+  - `vm-revoo-db` – Ubuntu 22.04
+
+Uso (Azure Cloud Shell):
+
 ```bash
 chmod +x infra-revoo-azure.sh
 ./infra-revoo-azure.sh
-```
-
-**Importante:** edite as senhas no topo do script antes de rodar.
-
-## 2. Banco de Dados (VM Linux)
-
-Pasta: `db/`
-
-- `Dockerfile.mysql` : imagem customizada do MySQL 8
-- `init.sql` : cria DB e tabelas iniciais
-- `run-db.sh` : build + run do container com volume persistente
-
-Na VM Linux:
-```bash
-cd db
-chmod +x run-db.sh
-./run-db.sh
-docker ps
-docker logs -f mysql-revoo
-```
-
-## 3. Aplicação (VM Windows)
-
-Pasta: `windows/`
-
-- `setup-revoo.ps1` : helper para instalar Git e clonar o Revoo
-
-Depois configure a string de conexão apontando para o IP privado da VM Linux (ex.: `10.0.2.4`) e rode o projeto.
-
-## Cleanup
-`cleanup-azure.sh` remove o RG inteiro

@@ -1,17 +1,26 @@
-# Setup básico para rodar o Revoo na VM Windows
-# Execute no PowerShell como Admin
+# Revoo - Setup da VM Windows (App)
 
-Write-Host "== Instalando Git (se não existir) =="
+Write-Host "Revoo - Setup VM Windows" -ForegroundColor Cyan
+
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-  winget install --id Git.Git -e --source winget
+    Write-Host "Instalando Git..." -ForegroundColor Yellow
+    winget install --id Git.Git -e --source winget
+} else {
+    Write-Host "Git já instalado." -ForegroundColor Green
 }
 
-Write-Host "== Clone do projeto =="
-$repo = Read-Host "Cole o link do GitHub do Revoo"
+$repo = Read-Host "Cole o link HTTPS do repositório do Revoo"
+
+if (-not $repo) {
+    Write-Host "Nenhum repositório informado." -ForegroundColor Red
+    exit 1
+}
+
 cd $env:USERPROFILE\Desktop
 git clone $repo
+
 $folder = ($repo.Split('/')[-1]).Replace('.git','')
 cd $folder
 
-Write-Host "== Agora instale o runtime do seu stack (Node/Java/.NET) e rode o projeto =="
-Write-Host "Ex.: Node -> npm install ; npm run build ; npm start -- -H 0.0.0.0 -p 3000"
+Write-Host "Projeto clonado em: $(Get-Location)" -ForegroundColor Green
+Write-Host "Agora instale o runtime do projeto (Node/Java/.NET), ajuste a string de conexão para o IP privado da VM Linux (por exemplo 10.0.2.4) e rode a aplicação escutando em 0.0.0.0 na porta configurada." -ForegroundColor Cyan
